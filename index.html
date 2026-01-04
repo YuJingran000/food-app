@@ -461,7 +461,23 @@
                 <h2>🔄 数据共享</h2>
                 
                 <div class="qr-section">
-                    <h3 class="qr-title">� Gist数据同步</h3>
+                    <h3 class="qr-title">🔑 GitHub Token管理</h3>
+                    <p style="text-align: center; color: #666; margin-bottom: 20px;">输入GitHub Token以启用Gist数据同步功能</p>
+                    
+                    <div style="margin: 20px 0;">
+                        <label for="github-token-input" style="display: block; margin-bottom: 8px; font-weight: bold; color: #555;">GitHub Token：</label>
+                        <input type="password" id="github-token-input" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;" placeholder="请输入GitHub Token">
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button onclick="saveGitHubToken()" class="btn" style="flex: 1; margin-top: 0;">💾 保存Token</button>
+                            <button onclick="clearGitHubToken()" class="btn btn-secondary" style="flex: 1; margin-top: 0;">🗑️ 清除Token</button>
+                        </div>
+                    </div>
+                    
+                    <div id="token-status" style="margin: 20px 0; padding: 15px; border-radius: 10px; border-left: 4px solid #48bb78; display: none;"></div>
+                </div>
+                
+                <div class="qr-section">
+                    <h3 class="qr-title">🔄 Gist数据同步</h3>
                     <p style="text-align: center; color: #666; margin-bottom: 20px;">手动同步数据到Gist，或从Gist获取最新数据</p>
                     
                     <div class="share-buttons">
@@ -521,9 +537,9 @@
         // 当前登录用户
         let currentUser = null;
         
-        // ========== 请填写以下信息 ==========
-        const GIST_ID = '70ea4d84b1ad2fef8d8fa640d0bec2f2'; // 替换为您的Gist ID
-        const GITHUB_TOKEN = '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'; // 替换为您的GitHub Token
+        // Gist配置（从localStorage读取，避免直接提交到仓库）
+        let GIST_ID = '70ea4d84b1ad2fef8d8fa640d0bec2f2'; // 这个可以直接提交，是公开的Gist ID
+        let GITHUB_TOKEN = localStorage.getItem('food_app_github_token') || ''; // 从localStorage读取Token
         const GIST_FILENAME = 'food-app-data.json';
         
         // 优先使用localStorage，同时支持Gist同步
@@ -1002,6 +1018,54 @@
             }
         }
         
+        // 保存GitHub Token到localStorage
+        function saveGitHubToken() {
+            const tokenInput = document.getElementById('github-token-input');
+            const token = tokenInput.value.trim();
+            const tokenStatusDiv = document.getElementById('token-status');
+            
+            if (token) {
+                localStorage.setItem('food_app_github_token', token);
+                GITHUB_TOKEN = token;
+                
+                tokenStatusDiv.innerHTML = `<p style="color: #48bb78;">✅ Token已保存到本地</p>`;
+                tokenStatusDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                tokenStatusDiv.style.borderLeftColor = '#48bb78';
+                tokenInput.value = ''; // 清空输入框
+            } else {
+                tokenStatusDiv.innerHTML = `<p style="color: #f56565;">❌ 请输入有效的Token</p>`;
+                tokenStatusDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                tokenStatusDiv.style.borderLeftColor = '#f56565';
+            }
+            
+            tokenStatusDiv.style.display = 'block';
+            
+            // 3秒后隐藏结果
+            setTimeout(() => {
+                tokenStatusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
+        // 清除GitHub Token
+        function clearGitHubToken() {
+            localStorage.removeItem('food_app_github_token');
+            GITHUB_TOKEN = '';
+            
+            const tokenStatusDiv = document.getElementById('token-status');
+            tokenStatusDiv.innerHTML = `<p style="color: #48bb78;">✅ Token已清除</p>`;
+            tokenStatusDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+            tokenStatusDiv.style.borderLeftColor = '#48bb78';
+            tokenStatusDiv.style.display = 'block';
+            
+            // 清空输入框
+            document.getElementById('github-token-input').value = '';
+            
+            // 3秒后隐藏结果
+            setTimeout(() => {
+                tokenStatusDiv.style.display = 'none';
+            }, 3000);
+        }
+        
         // 手动同步数据到Gist
         async function manualSyncToGist() {
             const syncResultDiv = document.getElementById('sync-result');
@@ -1063,5 +1127,4 @@
         }
     </script>
 </body>
-
 </html>
