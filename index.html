@@ -461,7 +461,19 @@
                 <h2>🔄 数据共享</h2>
                 
                 <div class="qr-section">
-                    <h3 class="qr-title">📤 导出数据</h3>
+                    <h3 class="qr-title">� Gist数据同步</h3>
+                    <p style="text-align: center; color: #666; margin-bottom: 20px;">手动同步数据到Gist，或从Gist获取最新数据</p>
+                    
+                    <div class="share-buttons">
+                        <button onclick="manualSyncToGist()" class="btn">📤 手动同步到Gist</button>
+                        <button onclick="manualSyncFromGist()" class="btn">📥 从Gist获取最新</button>
+                    </div>
+                    
+                    <div id="sync-result" style="margin: 20px 0; padding: 15px; border-radius: 10px; border-left: 4px solid #48bb78; display: none;"></div>
+                </div>
+                
+                <div class="qr-section">
+                    <h3 class="qr-title">� 导出数据</h3>
                     <p style="text-align: center; color: #666; margin-bottom: 20px;">点击按钮将数据导出为JSON文件，可上传到百度网盘等云存储</p>
                     
                     <div class="share-buttons">
@@ -536,7 +548,7 @@
         async function saveToGist(data) {
             if (!GIST_ID || !GITHUB_TOKEN) {
                 console.log('Gist配置未完成，仅保存到本地');
-                return false;
+                return { success: false, message: 'Gist配置未完成' };
             }
             
             try {
@@ -554,10 +566,18 @@
                         }
                     })
                 });
-                return response.ok;
+                
+                if (response.ok) {
+                    console.log('数据成功保存到Gist');
+                    return { success: true, message: '数据成功保存到Gist' };
+                } else {
+                    const errorText = await response.text();
+                    console.error('保存数据到Gist失败:', response.status, errorText);
+                    return { success: false, message: `保存失败: ${response.status} - ${errorText}` };
+                }
             } catch (error) {
                 console.error('保存数据到Gist失败:', error);
-                return false;
+                return { success: false, message: `保存失败: ${error.message}` };
             }
         }
         
@@ -591,7 +611,9 @@
         // 保存数据
         async function saveData(data) {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-            await saveToGist(data);
+            const result = await saveToGist(data);
+            // 可以根据需要处理结果，例如显示提示信息
+            return result;
         }
         
         // 固定用户列表
@@ -978,6 +1000,66 @@
             } catch (error) {
                 showImportResult('❌ 无效的数据格式，请检查JSON格式', 'error');
             }
+        }
+        
+        // 手动同步数据到Gist
+        async function manualSyncToGist() {
+            const syncResultDiv = document.getElementById('sync-result');
+            try {
+                const data = getData();
+                const result = await saveToGist(data);
+                
+                if (result.success) {
+                    syncResultDiv.innerHTML = `<p style="color: #48bb78;">✅ ${result.message}</p>`;
+                    syncResultDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                    syncResultDiv.style.borderLeftColor = '#48bb78';
+                } else {
+                    syncResultDiv.innerHTML = `<p style="color: #f56565;">❌ ${result.message}</p>`;
+                    syncResultDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                    syncResultDiv.style.borderLeftColor = '#f56565';
+                }
+                syncResultDiv.style.display = 'block';
+                
+                // 3秒后隐藏结果
+                setTimeout(() => {
+                    syncResultDiv.style.display = 'none';
+                }, 3000);
+            } catch (error) {
+                syncResultDiv.innerHTML = `<p style="color: #f56565;">❌ 同步失败: ${error.message}</p>`;
+                syncResultDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                syncResultDiv.style.borderLeftColor = '#f56565';
+                syncResultDiv.style.display = 'block';
+                
+                setTimeout(() => {
+                    syncResultDiv.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // 手动从Gist获取最新数据
+        async function manualSyncFromGist() {
+            const syncResultDiv = document.getElementById('sync-result');
+            try {
+                await fetchFromGist();
+                // 更新UI
+                loadFoods();
+                loadRecords();
+                updateDrawPage();
+                
+                syncResultDiv.innerHTML = `<p style="color: #48bb78;">✅ 已从Gist获取最新数据</p>`;
+                syncResultDiv.style.background = 'rgba(72, 187, 120, 0.1)';
+                syncResultDiv.style.borderLeftColor = '#48bb78';
+            } catch (error) {
+                syncResultDiv.innerHTML = `<p style="color: #f56565;">❌ 获取数据失败: ${error.message}</p>`;
+                syncResultDiv.style.background = 'rgba(245, 101, 101, 0.1)';
+                syncResultDiv.style.borderLeftColor = '#f56565';
+            }
+            syncResultDiv.style.display = 'block';
+            
+            // 3秒后隐藏结果
+            setTimeout(() => {
+                syncResultDiv.style.display = 'none';
+            }, 3000);
         }
     </script>
 </body>
