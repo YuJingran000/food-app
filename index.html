@@ -303,7 +303,6 @@
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 
-                // 简化的QR码绘制（实际项目中应使用完整的QR码生成算法）
                 ctx.fillStyle = '#000000';
                 ctx.font = '16px Arial';
                 ctx.textAlign = 'center';
@@ -380,11 +379,11 @@
         <!-- 主应用页面 -->
         <div id="app-page" class="hidden">
             <div class="header">
-                <h1>🍽️ 今天吃什么？</h1>
+                <h1>🍽️ 咱俩今天吃什么？</h1>
                 <div class="nav">
-                    <button onclick="showPage('dashboard')" id="nav-dashboard" class="active">首页</button>
-                    <button onclick="showPage('foods')" id="nav-foods">美食库</button>
-                    <button onclick="showPage('records')" id="nav-records">📝 记录</button>
+                    <button onclick="showPage('dashboard')" id="nav-dashboard" class="active">来啦</button>
+                    <button onclick="showPage('foods')" id="nav-foods">吃啥啊</button>
+                    <button onclick="showPage('records')" id="nav-records">📝 看看你抽的啥</button>
                     <button onclick="showPage('share')" id="nav-share">🔄 共享</button>
                 </div>
             </div>
@@ -403,15 +402,15 @@
                     <button onclick="drawFood()" class="btn draw-btn">🍀 点击抽奖</button>
                     
                     <!-- 美食数量显示 -->
-                    <p id="food-total" style="color: #555; margin-top: 20px;">美食库中共有 0 种美食，祝你抽到心仪的美食！</p>
+                    <p id="food-total" style="color: #555; margin-top: 20px;">可选共有 0 种美食！不够自己加！</p>
                     
                     <div style="margin-top: 40px; padding: 20px; background: rgba(102, 126, 234, 0.05); border-radius: 15px;">
                         <h3 style="color: #667eea; margin-bottom: 15px;">📋 功能说明</h3>
                         <ul style="text-align: left; line-height: 2; color: #555; margin-left: 20px;">
-                            <li>📝 美食库 - 添加或删除想吃的美食</li>
+                            <li>📝 美食库 - 添加或删除想吃的</li>
                             <li>🍀 抽奖 - 随机抽取美食库中的一个</li>
-                            <li>📊 记录 - 查看历史用餐记录</li>
-                            <li>🔄 共享 - 通过QR码共享数据</li>
+                            <li>📊 记录 - 查看历史抽奖记录</li>
+                            <li>🔄 共享 - 共享数据</li>
                         </ul>
                     </div>
                 </div>
@@ -440,13 +439,13 @@
             
             <!-- 记录页面 -->
             <div id="records" class="card hidden">
-                <h2>📊 用餐记录</h2>
+                <h2>📊 抽奖记录</h2>
                 
                 <div id="records-content">
                     <div id="no-records" class="empty-state">
                         <i>📝</i>
-                        <p>暂无用餐记录</p>
-                        <p style="color: #999; margin-top: 10px;">快去抽奖，记录你的美食吧！</p>
+                        <p>暂无抽奖记录</p>
+                        <p style="color: #999; margin-top: 10px;">快去抽奖，看看吃啥！</p>
                         <button onclick="showPage('draw')" class="btn" style="margin-top: 20px; display: inline-block;">🎲 去抽奖</button>
                     </div>
                     
@@ -932,4 +931,5 @@
         }
     </script>
 </body>
+
 </html>
